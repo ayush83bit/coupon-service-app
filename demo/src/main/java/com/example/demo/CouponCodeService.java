@@ -16,7 +16,6 @@ public class CouponCodeService {
     private final CustomerRepository customerRepository;
     private final CustomerDiscountTypeRepository customerDiscountTypeRepository;
 
-    /* createCoupon */
     @Transactional
     public CouponCodeDto createCoupon(CouponCodeDto couponDto) {
         CouponCodeEntity entity = toEntity(couponDto);
@@ -24,14 +23,12 @@ public class CouponCodeService {
         return toDto(saved);
     }
 
-    /* getCouponById */
     public CouponCodeDto getCouponById(Long id) {
         CouponCodeEntity entity = couponCodeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Coupon not found with id: " + id));
         return toDto(entity);
     }
 
-    /* updateCoupon */
     @Transactional
     public CouponCodeDto updateCoupon(Long id, CouponCodeDto couponDto) {
         CouponCodeEntity existing = couponCodeRepository.findById(id)
@@ -50,13 +47,11 @@ public class CouponCodeService {
         return toDto(saved);
     }
 
-    /* deleteCoupon */
     @Transactional
     public void deleteCoupon(Long id) {
         if (!couponCodeRepository.existsById(id)) {
             throw new RuntimeException("Coupon not found with id: " + id);
         }
-        // delete any mapping rows first (avoids FK problems)
         List<CustomerDiscountType> mappings = customerDiscountTypeRepository.findByCouponCodeEntityId(id);
         if (mappings != null && !mappings.isEmpty()) {
             customerDiscountTypeRepository.deleteAll(mappings);
@@ -64,7 +59,6 @@ public class CouponCodeService {
         couponCodeRepository.deleteById(id);
     }
 
-    /* assignCouponToCustomers */
     @Transactional
     public void assignCouponToCustomers(Long couponId, List<Long> customerIds) {
         CouponCodeEntity coupon = couponCodeRepository.findById(couponId)
@@ -86,7 +80,6 @@ public class CouponCodeService {
         }
     }
 
-    /* getCouponCustomers */
     public List<CustomerDto> getCouponCustomers(Long couponId) {
         if (!couponCodeRepository.existsById(couponId)) {
             throw new RuntimeException("Coupon not found with id: " + couponId);
@@ -99,7 +92,6 @@ public class CouponCodeService {
                     CustomerEntity c = m.getCustomerEntity();
                     CustomerDto dto = new CustomerDto();
                     dto.setCustomerId(c.getCustomerId());
-                    // set name & phone (avoid setting email to prevent type mismatch if your DTO differs)
                     try {
                         dto.setCustomerName(c.getCustomerName());
                     } catch (Throwable ignored) { }
@@ -111,7 +103,6 @@ public class CouponCodeService {
                 .collect(Collectors.toList());
     }
 
-    /* ---------- simple mappers ---------- */
     private CouponCodeEntity toEntity(CouponCodeDto dto) {
         CouponCodeEntity e = new CouponCodeEntity();
         e.setId(dto.getId());
