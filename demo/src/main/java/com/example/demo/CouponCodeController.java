@@ -15,7 +15,7 @@ public class CouponCodeController {
 
     private final CouponCodeService couponService;
 
-    // Create a new coupon
+    
     @PostMapping
     public ResponseEntity<CouponCodeDto> createCoupon(@Valid @RequestBody CouponCodeDto couponDto) {
         CouponCodeDto created = couponService.createCoupon(couponDto);
